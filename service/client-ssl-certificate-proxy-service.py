@@ -63,11 +63,9 @@ def get(path):
 
     try:
         request_data = requests.get(request_url, auth=(username, pw), cert=request_cert).text
-        logger.info("Data received: %s:", request_data)
         #entities = json.loads(request_data)
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
-        #logger.warning("Data retrieved from service: %s", request_data)
         raise
 
     return Response(stream_odata_json(request_data), mimetype='application/json')
