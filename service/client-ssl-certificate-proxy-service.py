@@ -39,26 +39,17 @@ def stream_odata_json(odata):
     """fetch entities from given Odata url and dumps back to client as JSON stream"""
     first = True
     yield '['
+    data = json.loads(odata)
 
-    while True:
-        data = json.loads(odata)
+    for value in data['value']:
+        if not first:
+            yield ','
+        else:
+            first = False
 
-        for value in data['value']:
-            if not first:
-                yield ','
-            else:
-                first = False
+        value['_id'] = value['ProjectId']
 
-            if '@odata.id' in value:
-                id_val = re.search(r'\((.*?)\)', value['@odata.id']).group(1).replace("'", "")
-                value['_id'] = id_val
-
-            yield json.dumps(value)
-
-        if '@odata.nextLink' not in data:
-            break
-
-        url = data['@odata.nextLink']
+        yield json.dumps(value)
 
     yield ']'
 
