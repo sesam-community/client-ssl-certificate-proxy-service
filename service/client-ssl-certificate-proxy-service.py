@@ -16,11 +16,13 @@ username = os.environ.get("username")
 pw = os.environ.get("password")
 cert = os.environ.get("certificate").replace(r'\n', '\n')
 pkey = os.environ.get("private_key").replace(r'\n', '\n')
+ca = os.environ.get("ca_cert").replace(r'\n', '\n')
 
 
 def write_certificate():
     open(pkey_file, 'wb').write(bytes(pkey, 'ascii'))
     open(cert_file, 'wb').write(bytes(cert, 'ascii'))
+    open(ca_file, 'wb').write(bytes(ca, 'ascii'))
 
 
 def stream_json(clean):
@@ -62,7 +64,7 @@ def get(path):
     logger.info("Request url: %s", request_url)
 
     try:
-        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert).text
+        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert, verify=ca_file).text
         #entities = json.loads(request_data)
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
