@@ -64,7 +64,7 @@ def get(path):
     logger.info("Request url: %s", request_url)
 
     try:
-        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert, verify=ca_file).text
+        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert, verify=cert_file).text
         #entities = json.loads(request_data)
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
