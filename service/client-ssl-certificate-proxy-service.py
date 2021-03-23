@@ -9,20 +9,17 @@ app = Flask(__name__)
 logger = logger.Logger('client-ssl-certificate-proxy-service')
 pkey_file = 'pkey.pem'
 cert_file = 'cert.pem'
-ca_file = 'ca.pem'
 
 url = os.environ.get("base_url")
 username = os.environ.get("username")
 pw = os.environ.get("password")
 cert = os.environ.get("certificate").replace(r'\n', '\n')
 pkey = os.environ.get("private_key").replace(r'\n', '\n')
-ca = os.environ.get("ca_cert").replace(r'\n', '\n')
 
 
 def write_certificate():
     open(pkey_file, 'wb').write(bytes(pkey, 'ascii'))
     open(cert_file, 'wb').write(bytes(cert, 'ascii'))
-    open(ca_file, 'wb').write(bytes(ca, 'ascii'))
 
 
 def stream_json(clean):
@@ -64,8 +61,7 @@ def get(path):
     logger.info("Request url: %s", request_url)
 
     try:
-        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert, verify=cert_file).text
-        #entities = json.loads(request_data)
+        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert).text
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
         raise
