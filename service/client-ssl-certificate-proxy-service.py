@@ -34,25 +34,6 @@ def stream_json(clean):
     yield ']'
 
 
-def stream_odata_json(odata):
-    """fetch entities from given Odata url and dumps back to client as JSON stream"""
-    first = True
-    yield '['
-    data = json.loads(odata)
-
-    for value in data['value']:
-        if not first:
-            yield ','
-        else:
-            first = False
-
-        value['_id'] = value['ProjectId']
-
-        yield json.dumps(value)
-
-    yield ']'
-
-
 @app.route("/<path:path>", methods=["GET"])
 def get(path):
     request_url = "{0}{1}".format(url, path)
@@ -62,16 +43,15 @@ def get(path):
 
     try:
         request_data = requests.get(request_url, auth=(username, pw), cert=request_cert).text
+        entities = json.loads(request_data)
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
         raise
 
-    return Response(stream_odata_json(request_data), mimetype='application/json')
-
-    #return Response(
-    #        stream_json(entities),
-    #        mimetype='application/json'
-    #    )
+    return Response(
+            stream_json(entities),
+            mimetype='application/json'
+        )
 
 
 if __name__ == '__main__':
