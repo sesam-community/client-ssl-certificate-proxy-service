@@ -42,15 +42,13 @@ def get(path):
     logger.info("Request url: %s", request_url)
 
     try:
-        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert).text
-        entities = json.loads(request_data)
-        logger.info("Data received: %s", request_data[0:1000])
+        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert)
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
         raise
 
     return Response(
-            stream_json(entities),
+            request_data,
             mimetype='application/json'
         )
 
