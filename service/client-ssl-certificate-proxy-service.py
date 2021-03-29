@@ -1,4 +1,3 @@
-import json
 import requests
 from flask import Flask, Response
 import os
@@ -20,18 +19,6 @@ pkey = os.environ.get("private_key").replace(r'\n', '\n')
 def write_certificate():
     open(pkey_file, 'wb').write(bytes(pkey, 'ascii'))
     open(cert_file, 'wb').write(bytes(cert, 'ascii'))
-
-
-def stream_json(clean):
-    first = True
-    yield '['
-    for i, row in enumerate(clean):
-        if not first:
-            yield ','
-        else:
-            first = False
-        yield json.dumps(row)
-    yield ']'
 
 
 @app.route("/<path:path>", methods=["GET"])
