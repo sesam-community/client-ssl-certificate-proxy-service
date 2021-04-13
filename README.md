@@ -16,6 +16,8 @@ A simple service that serves as a proxy for signing request calls to an API with
 
 `password` - password to the API service.
 
+`log_response_data` - set this value to true to log the received data for debugging purposes, default value: false.
+
 
 ### Example system config:
 
@@ -49,7 +51,7 @@ A simple service that serves as a proxy for signing request calls to an API with
   "type": "pipe",
   "source": {
     "is_chronological": false,
-    "is_since_comparable": true,
+    "is_since_comparable": false,
     "supports_since": false,
     "system": "client-ssl-certificate-proxy-system",
     "type": "json",
