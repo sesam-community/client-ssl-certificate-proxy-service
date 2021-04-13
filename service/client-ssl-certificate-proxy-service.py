@@ -14,6 +14,7 @@ username = os.environ.get("username")
 pw = os.environ.get("password")
 cert = os.environ.get("certificate").replace(r'\n', '\n')
 pkey = os.environ.get("private_key").replace(r'\n', '\n')
+log_response_data = os.environ.get("log_response_data", "false").lower() == "true"
 
 
 def write_certificate():
@@ -30,6 +31,8 @@ def get(path):
 
     try:
         request_data = requests.get(request_url, auth=(username, pw), cert=request_cert)
+        if log_response_data:
+            logger.info("Data received: '%s'", request_data.text)
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
         raise
