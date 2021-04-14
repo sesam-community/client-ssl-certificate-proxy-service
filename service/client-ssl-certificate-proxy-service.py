@@ -17,6 +17,20 @@ cert = os.environ.get("certificate").replace(r'\n', '\n')
 pkey = os.environ.get("private_key").replace(r'\n', '\n')
 log_response_data = os.environ.get("log_response_data", "false").lower() == "true"
 headers = json.loads('{"Content-Type": "application/json"}')
+stream_data = os.environ.get("stream_data", "false").lower() == "true"
+
+
+def stream_json(clean):
+    data = json.loads(clean)
+    first = True
+    yield '['
+    for i, row in enumerate(data):
+        if not first:
+            yield ','
+        else:
+            first = False
+        yield json.dumps(row)
+    yield ']'
 
 
 class BasicUrlSystem:
@@ -48,17 +62,16 @@ def get(path):
     try:
         with session_factory.make_session() as s:
             request_data = s.request("GET", request_url, auth=(username, pw), cert=request_cert, headers=headers)
-            #request_data = requests.get(request_url, auth=(username, pw), cert=request_cert)
             if log_response_data:
                 logger.info("Data received: '%s'", request_data.text)
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
         raise
 
-    return Response(
-            request_data,
-            mimetype='application/json'
-        )
+    if stream_data:
+        return Response(stream_json(request_data.text), mimetype='application/json')
+
+    return Response(request_data, mimetype='application/json')
 
 
 if __name__ == '__main__':

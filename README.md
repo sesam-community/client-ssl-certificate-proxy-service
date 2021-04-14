@@ -18,6 +18,8 @@ A simple service that serves as a proxy for signing request calls to an API with
 
 `log_response_data` - set this value to true to log the received data for debugging purposes, default value: false.
 
+`stream_data` - stream response data, default value: false.
+
 
 ### Example system config:
 
