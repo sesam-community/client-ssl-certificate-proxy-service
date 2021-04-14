@@ -1,8 +1,9 @@
 import requests
-from flask import Flask, Response
+from flask import Flask, Response, request
 import os
 import logger
 import cherrypy
+import json
 
 app = Flask(__name__)
 logger = logger.Logger('client-ssl-certificate-proxy-service')
@@ -15,6 +16,21 @@ pw = os.environ.get("password")
 cert = os.environ.get("certificate").replace(r'\n', '\n')
 pkey = os.environ.get("private_key").replace(r'\n', '\n')
 log_response_data = os.environ.get("log_response_data", "false").lower() == "true"
+headers = json.loads('{"Content-Type": "application/json"}')
+
+
+class BasicUrlSystem:
+    def __init__(self, config):
+        self._config = config
+
+    def make_session(self):
+        session = requests.Session()
+        session.headers = self._config["headers"]
+        session.verify = True
+        return session
+
+
+session_factory = BasicUrlSystem({"headers": headers})
 
 
 def write_certificate():
@@ -30,9 +46,11 @@ def get(path):
     logger.info("Request url: %s", request_url)
 
     try:
-        request_data = requests.get(request_url, auth=(username, pw), cert=request_cert)
-        if log_response_data:
-            logger.info("Data received: '%s'", request_data.text)
+        with session_factory.make_session() as s:
+            request_data = s.request("GET", request_url, auth=(username, pw), cert=request_cert, headers=headers)
+            #request_data = requests.get(request_url, auth=(username, pw), cert=request_cert)
+            if log_response_data:
+                logger.info("Data received: '%s'", request_data.text)
     except Exception as e:
         logger.warning("Exception occurred when download data from '%s': '%s'", request_url, e)
         raise
