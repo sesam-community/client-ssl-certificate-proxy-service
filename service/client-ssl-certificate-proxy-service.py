@@ -55,6 +55,9 @@ def write_certificate():
 @app.route("/<path:path>", methods=["GET"])
 def get(path):
     request_url = "{0}{1}".format(url, path)
+    if request.query_string:
+        request_url = "{0}?{1}".format(request_url, request.query_string.decode("utf-8"))
+
     request_cert = (cert_file, pkey_file)
 
     logger.info("Request url: %s", request_url)
