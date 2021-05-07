@@ -3,3 +3,4 @@ Flask==0.12.3
 CherryPy==10.2.1
 pyopenssl==19.1.0
 cryptography==3.4.6
+ujson=4.0.2

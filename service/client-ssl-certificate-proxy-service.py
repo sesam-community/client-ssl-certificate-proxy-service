@@ -3,7 +3,7 @@ from flask import Flask, Response, request
 import os
 import logger
 import cherrypy
-import json
+import ujson
 
 app = Flask(__name__)
 logger = logger.Logger('client-ssl-certificate-proxy-service')
@@ -16,12 +16,12 @@ pw = os.environ.get("password")
 cert = os.environ.get("certificate").replace(r'\n', '\n')
 pkey = os.environ.get("private_key").replace(r'\n', '\n')
 log_response_data = os.environ.get("log_response_data", "false").lower() == "true"
-headers = json.loads('{"Content-Type": "application/json"}')
+headers = ujson.loads('{"Content-Type": "application/json"}')
 stream_data = os.environ.get("stream_data", "false").lower() == "true"
 
 
 def stream_json(clean):
-    data = json.loads(clean)
+    data = ujson.loads(clean)
     first = True
     yield '['
     for i, row in enumerate(data):
@@ -29,7 +29,7 @@ def stream_json(clean):
             yield ','
         else:
             first = False
-        yield json.dumps(row)
+        yield ujson.dumps(row)
     yield ']'
 
 
